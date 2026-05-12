@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Examen · Distribuciones Muestrales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1e2530;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --accent2: #7ee787;
+      --accent3: #f78166;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --gold: #d4a843;
+      --purple: #bc8cff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(88,166,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(88,166,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 32px 100px;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 40px;
+      margin-bottom: 60px;
+      position: relative;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(88,166,255,0.12);
+      border: 1px solid rgba(88,166,255,0.3);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    h1 em {
+      color: var(--gold);
+      font-style: italic;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+    }
+    .corner-decoration {
+      position: absolute;
+      top: 0; right: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(88,166,255,0.25);
+      text-align: right;
+      line-height: 1.8;
+    }
+
+    /* ── Section cards ── */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 40px;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease both;
+    }
+    .section-card:nth-child(2) { animation-delay: 0.1s; }
+    .section-card:nth-child(3) { animation-delay: 0.2s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .num-badge {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .num-badge.blue  { background: rgba(88,166,255,0.15); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
+    .num-badge.green { background: rgba(126,231,135,0.15); color: var(--accent2); border: 1px solid rgba(126,231,135,0.3); }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .card-title small {
+      display: block;
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .card-body { padding: 28px; }
+
+    /* ── Problem statement ── */
+    .problem-box {
+      background: rgba(88,166,255,0.05);
+      border: 1px solid rgba(88,166,255,0.15);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .problem-box strong { color: var(--text); }
+
+    /* ── Data grid ── */
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .data-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .data-item .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .data-item .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    /* ── Steps ── */
+    .step-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 24px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-label::before {
+      content: '▸';
+      font-size: 0.6rem;
+    }
+
+    /* ── Hypothesis block ── */
+    .hyp-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .hyp-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+    .hyp-item .hyp-name { color: var(--muted); font-size: 0.68rem; margin-bottom: 4px; }
+    .hyp-item .hyp-formula { color: var(--text); }
+
+    /* ── Formula display ── */
+    .formula-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 12px 0 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 2;
+      position: relative;
+      overflow: hidden;
+    }
+    .formula-block::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--purple);
+      border-radius: 3px 0 0 3px;
+    }
+    .formula-block .formula-line {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .formula-block .formula-key {
+      color: var(--purple);
+      font-size: 0.95rem;
+    }
+    .formula-block .formula-result {
+      color: var(--gold);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* ── Comparison box ── */
+    .compare-box {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+      margin: 16px 0 20px;
+    }
+    .compare-value {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .compare-value .cv-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+    .compare-value .cv-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .cv-num.calc { color: var(--accent3); }
+    .cv-num.crit { color: var(--accent); }
+    .compare-op {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      color: var(--accent3);
+      text-align: center;
+    }
+
+    /* ── Verdict ── */
+    .verdict {
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-top: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .verdict.reject {
+      background: rgba(247,129,102,0.08);
+      border: 1px solid rgba(247,129,102,0.3);
+    }
+    .verdict.accept {
+      background: rgba(126,231,135,0.08);
+      border: 1px solid rgba(126,231,135,0.3);
+    }
+    .verdict-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .verdict-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .verdict.reject .verdict-title { color: var(--accent3); }
+    .verdict.accept .verdict-title { color: var(--accent2); }
+    .verdict-text {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .verdict-text strong { color: var(--text); }
+
+    /* ── IC Visual ── */
+    .ic-visual {
+      margin: 20px 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+    .ic-bar-wrap {
+      position: relative;
+      height: 18px;
+      margin: 20px 0 8px;
+    }
+    .ic-track {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 9px;
+    }
+    .ic-fill {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 36.97%; /* 73.94% of 0-100 range */
+      width: 8.12%; /* 82.06 - 73.94 */
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 9px;
+      animation: expandBar 1s ease 0.3s both;
+    }
+    @keyframes expandBar {
+      from { opacity: 0; transform: scaleX(0); transform-origin: center; }
+      to   { opacity: 1; transform: scaleX(1); }
+    }
+    .ic-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .ic-center-mark {
+      position: absolute;
+      left: 41%;
+      top: -8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .ic-endpoints {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .ic-endpoint {
+      text-align: center;
+    }
+    .ic-endpoint .ep-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+    .ic-endpoint .ep-lab {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .ic-arrow {
+      font-size: 1.3rem;
+      color: var(--muted);
+    }
+    .ic-phat {
+      text-align: center;
+    }
+    .ic-phat .ep-val { color: var(--gold); }
+
+    /* ── Conclusion banner ── */
+    .conclusion-banner {
+      background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(126,231,135,0.08));
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--accent2);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-top: 24px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .conclusion-banner strong { color: var(--accent2); }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+    footer span:last-child { color: rgba(88,166,255,0.4); }
+
+    @media (max-width: 600px) {
+      .hyp-block { grid-template-columns: 1fr; }
+      .compare-box { grid-template-columns: 1fr; }
+      .compare-op { display: none; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="corner-decoration">
+      EAN · PROB &amp; EST<br>DISTRIBUCIONES<br>MUESTRALES
+    </div>
+    <div class="badge">Probabilidad y Estadística Inferencial</div>
+    <h1>Examen — <em>Soluciones</em></h1>
+    <p class="subtitle">Puntos 2 y 3 · Distribuciones muestrales e intervalos de decisión</p>
+  </header>
+
+  <!-- ════════════════════════════════
+       PUNTO 2  — Prueba t-student
+  ════════════════════════════════ -->
+  <div class="section-card">
+    <div class="card-header">
+      <div class="num-badge blue">2</div>
+      <div class="card-title">
+        Prueba de Hipótesis — Laboratorio Farmacéutico
+        <small>Prueba t-Student · Una cola (izquierda) · α = 0.05</small>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="problem-box">
+        Se administra una nueva pastilla a <strong>n = 18</strong> conductores. El tiempo de reacción promedio normal es
+        <strong>μ₀ = 850 ms</strong>. La muestra arroja <strong>x̄ = 812 ms</strong> y <strong>s = 74 ms</strong>.
+        Se desconoce σ de la población. ¿La pastilla reduce significativamente el tiempo de reacción? (α = 0.05)
+      </div>
+
+      <!-- Data -->
+      <div class="data-grid">
+        <div class="data-item"><div class="label">μ₀</div><div class="value">850 ms</div></div>
+        <div class="data-item"><div class="label">x̄</div><div class="value">812 ms</div></div>
+        <div class="data-item"><div class="label">s</div><div class="value">74 ms</div></div>
+        <div class="data-item"><div class="label">n</div><div class="value">18</div></div>
+        <div class="data-item"><div class="label">α</div><div class="value">0.05</div></div>
+        <div class="data-item"><div class="label">v = n−1</div><div class="value">17</div></div>
+      </div>
+
+      <!-- Hipótesis -->
+      <div class="step-label">Paso 1 · Planteamiento de hipótesis</div>
+      <div class="hyp-block">
+        <div class="hyp-item">
+          <div class="hyp-name">Hipótesis nula H₀</div>
+          <div class="hyp-formula">μ ≥ 850 ms<br><span style="color:var(--muted);font-size:0.75rem">La pastilla NO reduce el tiempo</span></div>
+        </div>
+        <div class="hyp-item">
+          <div class="hyp-name">Hipótesis alternativa H₁</div>
+          <div class="hyp-formula">μ &lt; 850 ms<br><span style="color:var(--muted);font-size:0.75rem">La pastilla SÍ reduce el tiempo</span></div>
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:4px;">
+        → Prueba de <strong style="color:var(--text)">una cola izquierda</strong> (se sospecha reducción).
+      </p>
+
+      <!-- Cálculo t -->
+      <div class="step-label">Paso 2 · Estadístico de prueba t</div>
+      <div class="formula-block">
+        <div class="formula-line">t = (x̄ − μ₀) / (s / √n)</div>
+        <div class="formula-line">t = (812 − 850) / (74 / √18)</div>
+        <div class="formula-line">t = −38 / (74 / 4.2426)</div>
+        <div class="formula-line">t = −38 / 17.4454</div>
+        <div class="formula-key">t<sub>calc</sub> = <span class="formula-result">−2.178</span></div>
+      </div>
+
+      <!-- Valor crítico -->
+      <div class="step-label">Paso 3 · Valor crítico (Tabla t)</div>
+      <div class="formula-block">
+        <div class="formula-line">v = 17, una cola, α = 0.05</div>
+        <div class="formula-line">De la tabla t-Student:</div>
+        <div class="formula-key">t<sub>crítico</sub> = <span class="formula-result">−1.740</span></div>
+      </div>
+
+      <!-- Comparación -->
+      <div class="step-label">Paso 4 · Decisión</div>
+      <div class="compare-box">
+        <div class="compare-value">
+          <div class="cv-label">t calculado</div>
+          <div class="cv-num calc">−2.178</div>
+        </div>
+        <div class="compare-op">&lt;</div>
+        <div class="compare-value">
+          <div class="cv-label">t crítico</div>
+          <div class="cv-num crit">−1.740</div>
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);">
+        Como <strong style="color:var(--text)">t<sub>calc</sub> = −2.178 &lt; t<sub>crit</sub> = −1.740</strong>,
+        el estadístico cae en la región de rechazo.
+      </p>
+
+      <!-- Veredicto -->
+      <div class="verdict reject">
+        <div class="verdict-icon">⚠</div>
+        <div>
+          <div class="verdict-title">Se Rechaza H₀</div>
+          <div class="verdict-text">
+            Con un nivel de significancia del <strong>5%</strong>, existe evidencia estadística suficiente para concluir que
+            <strong>la pastilla sí reduce significativamente el tiempo de reacción de los conductores</strong>
+            (de 850 ms a aproximadamente 812 ms en promedio).
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       PUNTO 3  — Intervalo de Confianza
+  ════════════════════════════════ -->
+  <div class="section-card">
+    <div class="card-header">
+      <div class="num-badge green">3</div>
+      <div class="card-title">
+        Intervalo de Confianza para una Proporción — Fintech
+        <small>IC del 95% · Distribución Z · n = 400</small>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <div class="problem-box">
+        Una fintech toma una muestra de <strong>n = 400</strong> clientes.
+        <strong>312</strong> pagaron correctamente sus microcréditos.
+        Construya un intervalo de confianza del <strong>95%</strong> para la verdadera proporción poblacional.
+      </div>
+
+      <!-- Data -->
+      <div class="data-grid">
+        <div class="data-item"><div class="label">n</div><div class="value">400</div></div>
+        <div class="data-item"><div class="label">Éxitos</div><div class="value">312</div></div>
+        <div class="data-item"><div class="label">p̂</div><div class="value">0.78</div></div>
+        <div class="data-item"><div class="label">q̂ = 1−p̂</div><div class="value">0.22</div></div>
+        <div class="data-item"><div class="label">Confianza</div><div class="value">95%</div></div>
+        <div class="data-item"><div class="label">Z<sub>α/2</sub></div><div class="value">1.96</div></div>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="step-label">Paso 1 · Proporción muestral</div>
+      <div class="formula-block">
+        <div class="formula-line">p̂ = x / n = 312 / 400</div>
+        <div class="formula-key">p̂ = <span class="formula-result">0.78 (78%)</span></div>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="step-label">Paso 2 · Error estándar</div>
+      <div class="formula-block">
+        <div class="formula-line">SE = √( p̂ · q̂ / n )</div>
+        <div class="formula-line">SE = √( 0.78 × 0.22 / 400 )</div>
+        <div class="formula-line">SE = √( 0.1716 / 400 )</div>
+        <div class="formula-line">SE = √( 0.000429 )</div>
+        <div class="formula-key">SE = <span class="formula-result">0.02071</span></div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="step-label">Paso 3 · Margen de error</div>
+      <div class="formula-block">
+        <div class="formula-line">E = Z<sub>α/2</sub> × SE = 1.96 × 0.02071</div>
+        <div class="formula-key">E = <span class="formula-result">± 0.0406 (± 4.06%)</span></div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="step-label">Paso 4 · Intervalo de confianza</div>
+      <div class="formula-block">
+        <div class="formula-line">IC = p̂ ± E = 0.78 ± 0.0406</div>
+        <div class="formula-key">IC = <span class="formula-result">( 0.7394 ; 0.8206 )</span></div>
+        <div class="formula-key">IC = <span class="formula-result">( 73.94% ; 82.06% )</span></div>
+      </div>
+
+      <!-- Visual bar -->
+      <div class="ic-visual">
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:4px;font-family:'JetBrains Mono',monospace;">INTERVALO ESTIMADO (0% — 100%)</p>
+        <div class="ic-bar-wrap">
+          <div class="ic-track"></div>
+          <div class="ic-fill"></div>
+          <div class="ic-center-mark">p̂=78%</div>
+        </div>
+        <div class="ic-labels"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+        <div class="ic-endpoints">
+          <div class="ic-endpoint">
+            <div class="ep-val">73.94%</div>
+            <div class="ep-lab">Límite inferior</div>
+          </div>
+          <div class="ic-arrow">←·→</div>
+          <div class="ic-phat">
+            <div class="ep-val" style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--gold);">p̂ = 78%</div>
+            <div class="ep-lab">Proporción muestral</div>
+          </div>
+          <div class="ic-arrow">←·→</div>
+          <div class="ic-endpoint">
+            <div class="ep-val">82.06%</div>
+            <div class="ep-lab">Límite superior</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conclusión -->
+      <div class="conclusion-banner">
+        Con un nivel de confianza del <strong>95%</strong>, se estima que la verdadera proporción de clientes que pagan
+        cumplidamente sus microcréditos se encuentra entre
+        <strong>73.94%</strong> y <strong>82.06%</strong>.
+        Esto significa que, si repitiéramos el muestreo múltiples veces, el 95% de los intervalos construidos
+        contendrían el verdadero parámetro poblacional p.
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>Examen · Distribuciones Muestrales · EAN</span>
+    <span>Probabilidad &amp; Estadística Inferencial</span>
+  </footer>
+
+</div>
+</body>
+</html>
